@@ -17,6 +17,7 @@ The plugin can:
 ## Repository Layout
 
 ```text
+.claude-plugin/marketplace.json
 .agents/plugins/marketplace.json
 plugins/meal-prep-agent/
   .codex-plugin/plugin.json
@@ -32,34 +33,38 @@ plugins/meal-prep-agent/
 
 ### Claude Code
 
-Use this repository as the plugin source for Claude Code:
+Add this repository as a Claude Code plugin marketplace:
 
-```bash
-git clone https://github.com/wezham/meal-prep-agent.git
+```text
+/plugin marketplace add wezham/meal-prep-agent
 ```
 
-Then add or enable the `plugins/meal-prep-agent` plugin according to your
-Claude Code plugin installation flow. The portable skill entrypoints are:
+Then install the plugin:
 
-- `plugins/meal-prep-agent/skills/weekly-meal-prep/SKILL.md`
-- `plugins/meal-prep-agent/skills/woolworths-cart-builder/SKILL.md`
+```text
+/plugin install meal-prep-agent@meal-prep-agent
+```
 
 ### Codex
 
-Clone the repository, then enable the repo-local plugin marketplace:
+Install the plugin from GitHub with the Codex Marketplace CLI:
 
 ```bash
-git clone https://github.com/wezham/meal-prep-agent.git
-cd meal-prep-agent
+npx codex-marketplace add wezham/meal-prep-agent --plugins
 ```
 
-Codex metadata lives in:
+To install only this plugin path:
+
+```bash
+npx codex-marketplace add wezham/meal-prep-agent/plugins/meal-prep-agent --plugin
+```
+
+Codex metadata also lives in this repo for repo-local marketplace usage:
 
 - `.agents/plugins/marketplace.json`
 - `plugins/meal-prep-agent/.codex-plugin/plugin.json`
 
-After the marketplace is available in Codex, install or enable `meal-prep-agent`
-and ask:
+After installing or enabling `meal-prep-agent`, ask:
 
 ```text
 Generate this week's meal prep plan.

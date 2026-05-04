@@ -1,0 +1,21 @@
+{
+  "name": "meal-prep-agent",
+  "owner": {
+    "name": "Wesley Hamburger"
+  },
+  "metadata": {
+    "description": "Cross-agent meal prep workflows for Claude Code and Codex.",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "meal-prep-agent",
+      "source": "./plugins/meal-prep-agent",
+      "description": "Generate weekly meal prep plans, combined grocery lists, Woolworths product links, and cart-review workflows.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Wesley Hamburger"
+      }
+    }
+  ]
+}
