@@ -1,9 +1,21 @@
 {
-  "servings": {
-    "lunches": 3,
-    "dinners": 3,
-    "servings_per_meal": 1,
-    "recipe_count": 2
+  "meal_plan": {
+    "breakfast": {
+      "servings": 0,
+      "recipe_count": 0,
+      "enabled": false
+    },
+    "lunch": {
+      "servings": 3,
+      "recipe_count": 1,
+      "enabled": true
+    },
+    "dinner": {
+      "servings": 3,
+      "recipe_count": 1,
+      "enabled": true
+    },
+    "servings_per_meal": 1
   },
   "optional_constants": [
     {

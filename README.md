@@ -7,7 +7,7 @@ Node, Bash scripts, or any other helper runtime.
 
 The plugin can:
 
-- generate 3 lunches and 3 dinners from 2 batch recipes
+- generate configurable breakfasts, lunches, and dinners from configured batch recipe counts
 - combine ingredients into one grocery list
 - produce concise batch-cooking instructions
 - avoid recent repeats with private local meal history
@@ -78,6 +78,16 @@ Codex:
 
 ```text
 Set up my meal prep profile.
+```
+
+Example configuration prompts:
+
+```text
+I want 3 breakfasts, 5 lunches, and 4 dinners each week.
+```
+
+```text
+Use 1 breakfast recipe, 2 different lunch recipes, and 2 different dinner recipes.
 ```
 
 The agent will ask plain-language questions, then create private runtime files

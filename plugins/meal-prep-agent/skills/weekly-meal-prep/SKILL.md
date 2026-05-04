@@ -1,6 +1,6 @@
 ---
 name: weekly-meal-prep
-description: Generate a weekly meal prep plan with 3 lunches and 3 dinners from 2 batch recipes, a combined ingredient list, batch cooking instructions, meal memory, optional profile constants, and Woolworths product links. Use when the user asks to create, plan, refresh, or generate weekly meal prep.
+description: Generate a configurable weekly meal prep plan with any enabled mix of breakfasts, lunches, and dinners, distinct recipe counts per meal type, a combined ingredient list, batch cooking instructions, meal memory, optional profile constants, and Woolworths product links. Use when the user asks to create, plan, refresh, configure, or generate weekly meal prep.
 ---
 
 # Weekly Meal Prep
@@ -14,7 +14,33 @@ Use this skill to run a parent-agent workflow that generates a weekly meal prep 
 
 On first run, create missing private runtime files by copying the template JSON content into `data/local/`. The agent should do this with its normal file tools.
 
-If the user asks to set up their meal prep profile, ask plain-language questions and then update `data/local/profile.json`. Useful setup questions include meal counts, dietary rules, allergies, dislikes, preferred cuisines, equipment, budget notes, and recurring optional staples.
+If the user asks to set up or change their meal prep profile, ask plain-language questions and then update `data/local/profile.json`. Useful setup questions include how many breakfasts, lunches, and dinners they want, how many distinct recipes for each meal type, dietary rules, allergies, dislikes, preferred cuisines, equipment, budget notes, and recurring optional staples.
+
+## Meal Type Configuration
+
+Use `profile.meal_plan` as the source of truth for meal counts:
+
+```json
+{
+  "meal_plan": {
+    "breakfast": {"servings": 0, "recipe_count": 0, "enabled": false},
+    "lunch": {"servings": 3, "recipe_count": 1, "enabled": true},
+    "dinner": {"servings": 3, "recipe_count": 1, "enabled": true},
+    "servings_per_meal": 1
+  }
+}
+```
+
+Rules:
+
+- `servings` means how many meals of that type to prep for the week.
+- `recipe_count` means how many distinct batch recipes should cover that meal type.
+- If `servings` is `0` or `enabled` is `false`, do not plan that meal type.
+- If a user says "N breakfasts", set `meal_plan.breakfast.servings` to `N` and enable breakfast.
+- If a user says "2 different lunch meals" or "2 lunch recipes", set `meal_plan.lunch.recipe_count` to `2`.
+- If a user says "5 lunches" or "5 lunch portions", set `meal_plan.lunch.servings` to `5`.
+- Keep `recipe_count` between `0` and `servings` for each meal type. If the user asks for more recipes than servings, set recipes equal to servings and mention the adjustment.
+- Default to the template values if the user has not configured meal counts: 3 lunches from 1 lunch recipe and 3 dinners from 1 dinner recipe.
 
 Always read the private profile and history before planning. Summarize recent meal names, primary proteins, core ingredients, cuisine tags, and sauce profiles from `history.json` directly before choosing recipes.
 
@@ -25,7 +51,7 @@ The parent agent owns orchestration and final review. It must:
 1. Create missing private runtime files from templates if needed, then read `data/local/profile.json` and `data/local/history.json`.
 2. If the private profile is still a mostly empty template, offer to set it up conversationally before planning.
 3. If the active profile has `optional_constants`, ask the user which constants they need this week before planning the grocery list.
-4. Ask a recipe-planning sub-agent to propose exactly 2 batch recipes that cover exactly 3 lunches and exactly 3 dinners.
+4. Ask a recipe-planning sub-agent to propose exactly the configured recipe counts for each enabled meal type, covering exactly the configured servings.
 5. Ask an instruction sub-agent to convert the recipes into one practical batch-cooking sequence.
 6. Ask an ingredient-combiner sub-agent to merge all recipe ingredients plus only the user-selected optional constants into one concise grocery list.
 7. Pass each grocery-list ingredient to a Woolworths lookup sub-agent, one ingredient at a time.
@@ -56,12 +82,15 @@ Rules:
 
 ## Recipe-Planning Sub-Agent Brief
 
-Ask the recipe-planning sub-agent to produce exactly 2 batch recipes that cover the weekly meal slots:
+Ask the recipe-planning sub-agent to produce the configured number of batch recipes for each enabled meal type. The plan must cover the exact configured serving counts from `profile.meal_plan`.
 
-- 3 lunches
-- 3 dinners
+For the default template, this means:
 
-The 2 recipes should normally be one lunch recipe and one dinner recipe, each cooked in 3 portions. If there is a strong preservation or crossover reason, the sub-agent may map the 2 recipes across lunch and dinner slots differently, but it must still produce exactly 6 planned servings total.
+- 0 breakfasts
+- 3 lunches from 1 lunch recipe
+- 3 dinners from 1 dinner recipe
+
+If the user configures breakfast, include breakfast recipes and breakfast meal slots. If there is a strong preservation or crossover reason, the sub-agent may map a recipe across meal types, but it must still respect the configured total servings and distinct recipe counts as closely as practical and explain any deviation.
 
 The recipes must optimize for:
 
@@ -77,12 +106,17 @@ Avoid:
 - recipes that require a blender, food processor, slow cooker, pressure cooker, grill, or stand mixer
 - repeating the same cuisine, sauce profile, or primary protein too often
 - niche ingredients that are hard to buy at Woolworths unless the profile explicitly prefers them
-- creating more than 2 recipes
+- creating more recipes than configured
 
 Require this shape from the sub-agent:
 
 ```json
 {
+  "meal_plan": {
+    "breakfast": {"servings": 0, "recipe_count": 0, "enabled": false},
+    "lunch": {"servings": 3, "recipe_count": 1, "enabled": true},
+    "dinner": {"servings": 3, "recipe_count": 1, "enabled": true}
+  },
   "recipes": [
     {
       "name": "",
@@ -117,13 +151,16 @@ Require this shape from the sub-agent:
       "serving_number": 1
     }
   ],
+  "breakfasts": [],
+  "total_servings": 6,
+  "total_recipes": 2,
   "repeat_avoidance_note": ""
 }
 ```
 
 ## Instruction Sub-Agent Brief
 
-Ask the instruction sub-agent for one concise batch-cooking plan for the 2 recipes, not six disconnected meals.
+Ask the instruction sub-agent for one concise batch-cooking plan for the configured recipes, not disconnected meals.
 
 The plan must:
 
@@ -135,7 +172,7 @@ The plan must:
 
 ## Ingredient-Combiner Sub-Agent Brief
 
-Ask the ingredient-combiner sub-agent to create one grocery list from the 2 recipes and only the optional constants the user selected after being prompted.
+Ask the ingredient-combiner sub-agent to create one grocery list from all configured recipes and only the optional constants the user selected after being prompted.
 
 The list must:
 
@@ -220,7 +257,9 @@ End by asking whether to save the plan to memory. Save it only if the user appro
 When saving a plan, append a new entry to the active private history with:
 
 - `generated_at`
+- `meal_plan`
 - `recipes`
+- `breakfasts`
 - `lunches`
 - `dinners`
 - `core_ingredients`

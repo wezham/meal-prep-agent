@@ -11,7 +11,7 @@
     {
       "name": "meal-prep-agent",
       "source": "./plugins/meal-prep-agent",
-      "description": "Generate weekly meal prep plans, combined grocery lists, Woolworths product links, and cart-review workflows.",
+      "description": "Generate configurable weekly meal prep plans for breakfasts, lunches, and dinners, plus combined grocery lists, Woolworths product links, and cart-review workflows.",
       "version": "0.1.0",
       "author": {
         "name": "Wesley Hamburger"

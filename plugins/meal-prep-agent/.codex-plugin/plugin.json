@@ -1,7 +1,7 @@
 {
   "name": "meal-prep-agent",
   "version": "0.1.0",
-  "description": "Cross-agent meal prep workflows for weekly planning, meal memory, Woolworths product lookup, and Woolworths cart building.",
+  "description": "Cross-agent meal prep workflows for configurable weekly breakfasts, lunches, dinners, meal memory, Woolworths product lookup, and Woolworths cart building.",
   "author": {
     "name": "Wesley Hamburger"
   },
@@ -18,7 +18,7 @@
   "interface": {
     "displayName": "Meal Prep Agent",
     "shortDescription": "Generate meal prep plans and build Woolworths carts.",
-    "longDescription": "Creates weekly meal prep plans with three lunches and three dinners from two batch recipes, combined ingredient lists, cooking instructions, local meal history, optional constants, Woolworths product-link lookup, and a browser workflow for building a Woolworths cart.",
+    "longDescription": "Creates configurable weekly meal prep plans for breakfasts, lunches, and dinners with per-meal-type recipe counts, combined ingredient lists, cooking instructions, local meal history, optional constants, Woolworths product-link lookup, and a browser workflow for building a Woolworths cart.",
     "developerName": "Wesley Hamburger",
     "category": "Productivity",
     "capabilities": [
