@@ -3,9 +3,7 @@
   "version": "0.1.0",
   "description": "Cross-agent meal prep workflows for weekly planning, meal memory, Woolworths product lookup, and Woolworths cart building.",
   "author": {
-    "name": "Wesley Hamburger",
-    "email": "",
-    "url": ""
+    "name": "Wesley Hamburger"
   },
   "homepage": "https://github.com/wezham/meal-prep-agent",
   "repository": "https://github.com/wezham/meal-prep-agent",
