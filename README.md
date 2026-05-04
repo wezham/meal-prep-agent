@@ -90,6 +90,30 @@ I want 3 breakfasts, 5 lunches, and 4 dinners each week.
 Use 1 breakfast recipe, 2 different lunch recipes, and 2 different dinner recipes.
 ```
 
+### Meal Plan Settings
+
+The profile stores meal counts in `meal_plan`:
+
+```json
+{
+  "meal_plan": {
+    "breakfast": {"servings": 0, "recipe_count": 0, "enabled": false},
+    "lunch": {"servings": 3, "recipe_count": 1, "enabled": true},
+    "dinner": {"servings": 3, "recipe_count": 1, "enabled": true},
+    "servings_per_meal": 1
+  }
+}
+```
+
+- `breakfast`, `lunch`, and `dinner`: separate settings for each meal type.
+- `enabled`: whether that meal type should be included in weekly planning.
+- `servings`: how many portions of that meal type to prep for the week.
+- `recipe_count`: how many distinct batch recipes should cover those servings.
+- `servings_per_meal`: how many portions count as one meal for the user.
+
+For example, 5 lunches with `recipe_count: 2` means the agent should plan 5
+lunch portions spread across 2 different lunch recipes.
+
 The agent will ask plain-language questions, then create private runtime files
 from the templates:
 
