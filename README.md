@@ -1,8 +1,9 @@
 # Meal Prep Agent
 
 Meal Prep Agent is an open-source, cross-agent plugin for weekly meal prep
-planning. It packages portable `SKILL.md` workflows plus a small Python memory
-helper so the same workflows can be used from Claude Code and Codex.
+planning. It packages portable `SKILL.md` workflows so the same workflows can
+be used from Claude Code and Codex without requiring users to install Python,
+Node, Bash scripts, or any other helper runtime.
 
 The plugin can:
 
@@ -22,8 +23,6 @@ plugins/meal-prep-agent/
   data/
     profile.template.json
     history.template.json
-  scripts/
-    memory.py
   skills/
     weekly-meal-prep/SKILL.md
     woolworths-cart-builder/SKILL.md
@@ -36,7 +35,7 @@ plugins/meal-prep-agent/
 Use this repository as the plugin source for Claude Code:
 
 ```bash
-git clone https://github.com/wesleyhamburger/meal-prep-agent.git
+git clone https://github.com/wezham/meal-prep-agent.git
 ```
 
 Then add or enable the `plugins/meal-prep-agent` plugin according to your
@@ -50,7 +49,7 @@ Claude Code plugin installation flow. The portable skill entrypoints are:
 Clone the repository, then enable the repo-local plugin marketplace:
 
 ```bash
-git clone https://github.com/wesleyhamburger/meal-prep-agent.git
+git clone https://github.com/wezham/meal-prep-agent.git
 cd meal-prep-agent
 ```
 
@@ -68,56 +67,24 @@ Generate this week's meal prep plan.
 
 ## Configure Private Data
 
-Published data files are templates only. Initialize private runtime files before
-your first run:
+Published data files are templates only. Normal users should not need to edit
+JSON or run setup commands. After installing the plugin, ask Claude Code or
+Codex:
 
-```bash
-python3 plugins/meal-prep-agent/scripts/memory.py init
-python3 plugins/meal-prep-agent/scripts/memory.py paths
+```text
+Set up my meal prep profile.
 ```
 
-By default, private data is created in:
+The agent will ask plain-language questions, then create private runtime files
+from the templates:
 
 ```text
 plugins/meal-prep-agent/data/local/
 ```
 
-That directory is ignored by git. To keep private state outside the repository,
-set `MEAL_PREP_AGENT_DATA_DIR`:
-
-```bash
-export MEAL_PREP_AGENT_DATA_DIR="$HOME/.meal-prep-agent"
-python3 plugins/meal-prep-agent/scripts/memory.py init
-```
-
-Edit the active `profile.json` to set dietary rules, dislikes, preferred
-cuisines, equipment, budget notes, and optional recurring grocery constants.
-
-## Memory Helper
-
-Print active data paths:
-
-```bash
-python3 plugins/meal-prep-agent/scripts/memory.py paths
-```
-
-Print recent repeat-avoidance context:
-
-```bash
-python3 plugins/meal-prep-agent/scripts/memory.py summary
-```
-
-Compare a candidate accepted-plan JSON file to recent history:
-
-```bash
-python3 plugins/meal-prep-agent/scripts/memory.py compare-plan --plan-file /path/to/plan.json
-```
-
-Append an accepted plan:
-
-```bash
-python3 plugins/meal-prep-agent/scripts/memory.py append-plan --plan-file /path/to/accepted-plan.json
-```
+That directory is ignored by git. The agent reads the private profile and meal
+history directly, summarizes recent meals to avoid repeats, and appends accepted
+plans after explicit approval.
 
 The skill should only append plans after explicit user approval.
 

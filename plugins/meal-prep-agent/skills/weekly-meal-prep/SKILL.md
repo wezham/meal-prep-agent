@@ -5,36 +5,32 @@ description: Generate a weekly meal prep plan with 3 lunches and 3 dinners from 
 
 # Weekly Meal Prep
 
-Use this skill to run a parent-agent workflow that generates a weekly meal prep plan. The workflow is manual in v1 and uses private local JSON files for user preferences and meal history.
+Use this skill to run a parent-agent workflow that generates a weekly meal prep plan. The workflow is manual in v1 and uses private local JSON files for user preferences and meal history. Do not require the user to install or run Python, Node, Bash, or any helper script.
 
 ## Local Files
 
-- Helper: `plugins/meal-prep-agent/scripts/memory.py`
 - Templates: `plugins/meal-prep-agent/data/profile.template.json` and `plugins/meal-prep-agent/data/history.template.json`
 - Default private runtime data: `plugins/meal-prep-agent/data/local/profile.json` and `plugins/meal-prep-agent/data/local/history.json`
 
-Run the helper before planning:
+On first run, create missing private runtime files by copying the template JSON content into `data/local/`. The agent should do this with its normal file tools.
 
-```bash
-python3 plugins/meal-prep-agent/scripts/memory.py init
-python3 plugins/meal-prep-agent/scripts/memory.py paths
-python3 plugins/meal-prep-agent/scripts/memory.py summary
-```
+If the user asks to set up their meal prep profile, ask plain-language questions and then update `data/local/profile.json`. Useful setup questions include meal counts, dietary rules, allergies, dislikes, preferred cuisines, equipment, budget notes, and recurring optional staples.
 
-Always read the active profile and history paths printed by the helper before planning. Users may set `MEAL_PREP_AGENT_DATA_DIR` to keep private data outside the plugin directory. Use the helper script when you need a compact repeat-avoidance summary or need to append an accepted plan to memory.
+Always read the private profile and history before planning. Summarize recent meal names, primary proteins, core ingredients, cuisine tags, and sauce profiles from `history.json` directly before choosing recipes.
 
 ## Parent Agent Responsibilities
 
 The parent agent owns orchestration and final review. It must:
 
-1. Initialize runtime files if needed, then read the active `profile.json` and `history.json`.
-2. If the active profile has `optional_constants`, ask the user which constants they need this week before planning the grocery list.
-3. Ask a recipe-planning sub-agent to propose exactly 2 batch recipes that cover exactly 3 lunches and exactly 3 dinners.
-4. Ask an instruction sub-agent to convert the recipes into one practical batch-cooking sequence.
-5. Ask an ingredient-combiner sub-agent to merge all recipe ingredients plus only the user-selected optional constants into one concise grocery list.
-6. Pass each grocery-list ingredient to a Woolworths lookup sub-agent, one ingredient at a time.
-7. Present the full plan to the user before treating it as complete.
-8. Append the accepted plan to the active private `history.json` only after user acceptance or an explicit request to save it.
+1. Create missing private runtime files from templates if needed, then read `data/local/profile.json` and `data/local/history.json`.
+2. If the private profile is still a mostly empty template, offer to set it up conversationally before planning.
+3. If the active profile has `optional_constants`, ask the user which constants they need this week before planning the grocery list.
+4. Ask a recipe-planning sub-agent to propose exactly 2 batch recipes that cover exactly 3 lunches and exactly 3 dinners.
+5. Ask an instruction sub-agent to convert the recipes into one practical batch-cooking sequence.
+6. Ask an ingredient-combiner sub-agent to merge all recipe ingredients plus only the user-selected optional constants into one concise grocery list.
+7. Pass each grocery-list ingredient to a Woolworths lookup sub-agent, one ingredient at a time.
+8. Present the full plan to the user before treating it as complete.
+9. Append the accepted plan to the active private `history.json` only after user acceptance or an explicit request to save it.
 
 Do not save a generated plan to memory before the user accepts it.
 
@@ -231,10 +227,4 @@ When saving a plan, append a new entry to the active private history with:
 - `cuisine_tags`
 - `repeat_avoidance_note`
 
-Prefer using:
-
-```bash
-python3 plugins/meal-prep-agent/scripts/memory.py append-plan --plan-file /path/to/accepted-plan.json
-```
-
-The accepted plan JSON should include the fields above. If saving manually, preserve the top-level `version` and append to `generated_plans`. Do not write private meal history back to template files.
+The accepted plan JSON should include the fields above. Preserve the top-level `version` and append to `generated_plans`. Do not write private meal history back to template files. If the JSON file is invalid or cannot be updated cleanly, stop and explain the issue instead of guessing.
