@@ -1,0 +1,54 @@
+{
+  "servings": {
+    "lunches": 3,
+    "dinners": 3,
+    "servings_per_meal": 1,
+    "recipe_count": 2
+  },
+  "optional_constants": [
+    {
+      "ingredient": "rolled oats",
+      "quantity": "",
+      "notes": "Optional recurring staple. Ask the user whether to include it before adding it to the grocery list."
+    },
+    {
+      "ingredient": "frozen berries",
+      "quantity": "",
+      "notes": "Optional recurring staple. Ask the user whether to include it before adding it to the grocery list."
+    },
+    {
+      "ingredient": "bananas",
+      "quantity": "5",
+      "notes": "Optional recurring staple. Ask the user whether to include it before adding it to the grocery list."
+    }
+  ],
+  "dietary_rules": [],
+  "allergies": [],
+  "dislikes": [],
+  "preferred_cuisines": [],
+  "avoid_cuisines": [],
+  "nutrition_goals": [
+    "balanced protein, vegetables, and carbohydrates",
+    "meals that reheat well"
+  ],
+  "budget_notes": "Prefer common supermarket ingredients and avoid specialty items unless they meaningfully improve the plan.",
+  "available_equipment": [
+    "oven",
+    "stove",
+    "air fryer",
+    "rice cooker"
+  ],
+  "meal_prep_preferences": {
+    "optimize_for": [
+      "low-effort batch cooking",
+      "good preservation",
+      "ingredient crossover without repetitive meals"
+    ],
+    "max_active_cooking_minutes": 90,
+    "storage_days": 4
+  },
+  "woolworths": {
+    "country": "Australia",
+    "allow_best_match_with_confidence": true
+  }
+}

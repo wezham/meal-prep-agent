@@ -1,0 +1,10 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+.mypy_cache/
+.pytest_cache/
+
+# User-local meal prep state. Template files are tracked instead.
+plugins/meal-prep-agent/data/local/
+plugins/meal-prep-agent/data/profile.json
+plugins/meal-prep-agent/data/history.json

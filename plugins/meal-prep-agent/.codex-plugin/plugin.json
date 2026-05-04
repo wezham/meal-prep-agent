@@ -1,0 +1,40 @@
+{
+  "name": "meal-prep-agent",
+  "version": "0.1.0",
+  "description": "Cross-agent meal prep workflows for weekly planning, meal memory, Woolworths product lookup, and Woolworths cart building.",
+  "author": {
+    "name": "Wesley Hamburger",
+    "email": "",
+    "url": ""
+  },
+  "homepage": "https://github.com/wesleyhamburger/meal-prep-agent",
+  "repository": "https://github.com/wesleyhamburger/meal-prep-agent",
+  "license": "MIT",
+  "keywords": [
+    "meal-prep",
+    "planning",
+    "groceries",
+    "woolworths"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Meal Prep Agent",
+    "shortDescription": "Generate meal prep plans and build Woolworths carts.",
+    "longDescription": "Creates weekly meal prep plans with three lunches and three dinners from two batch recipes, combined ingredient lists, cooking instructions, local meal history, optional constants, Woolworths product-link lookup, and a browser workflow for building a Woolworths cart.",
+    "developerName": "Wesley Hamburger",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/wesleyhamburger/meal-prep-agent",
+    "privacyPolicyURL": "https://github.com/wesleyhamburger/meal-prep-agent/blob/main/SECURITY.md",
+    "termsOfServiceURL": "https://github.com/wesleyhamburger/meal-prep-agent/blob/main/LICENSE",
+    "defaultPrompt": [
+      "Generate this week's meal prep plan.",
+      "Create two low-effort meal-prep recipes.",
+      "Build a Woolworths cart from my grocery list."
+    ],
+    "brandColor": "#2F7D32"
+  }
+}

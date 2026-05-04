@@ -1,0 +1,20 @@
+{
+  "name": "meal-prep-agent",
+  "interface": {
+    "displayName": "Meal Prep Agent Plugins"
+  },
+  "plugins": [
+    {
+      "name": "meal-prep-agent",
+      "source": {
+        "source": "local",
+        "path": "./plugins/meal-prep-agent"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}
