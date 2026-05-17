@@ -20,6 +20,7 @@ The plugin can:
 .claude-plugin/marketplace.json
 .agents/plugins/marketplace.json
 plugins/meal-prep-agent/
+  .claude-plugin/plugin.json
   .codex-plugin/plugin.json
   data/
     profile.template.json
@@ -33,16 +34,47 @@ plugins/meal-prep-agent/
 
 ### Claude Code
 
-Add this repository as a Claude Code plugin marketplace:
+Start Claude Code in any trusted project, then add this repository as a plugin
+marketplace:
 
 ```text
 /plugin marketplace add wezham/meal-prep-agent
 ```
 
-Then install the plugin:
+Install the plugin from that marketplace:
 
 ```text
 /plugin install meal-prep-agent@meal-prep-agent
+```
+
+Restart Claude Code, or run `/reload-plugins` if your Claude Code version
+supports it. The plugin skills are then available with the plugin namespace:
+
+```text
+/meal-prep-agent:weekly-meal-prep
+/meal-prep-agent:woolworths-cart-builder
+```
+
+You can also ask in plain language and let Claude Code choose the right skill:
+
+```text
+Generate this week's meal prep plan.
+Build a Woolworths cart from this grocery list.
+```
+
+For local development, clone this repository, start Claude Code from the repo
+root, and add the checkout as a local marketplace:
+
+```text
+/plugin marketplace add .
+/plugin install meal-prep-agent@meal-prep-agent
+```
+
+To confirm the package is valid before installing from a checkout, run:
+
+```bash
+claude plugin validate .
+claude plugin validate plugins/meal-prep-agent
 ```
 
 ### Codex
