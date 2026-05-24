@@ -10,11 +10,14 @@ Use this skill to run a parent-agent workflow that generates a weekly meal prep 
 ## Local Files
 
 - Templates: `plugins/meal-prep-agent/data/profile.template.json` and `plugins/meal-prep-agent/data/history.template.json`
-- Default private runtime data: `plugins/meal-prep-agent/data/local/profile.json` and `plugins/meal-prep-agent/data/local/history.json`
+- Default private runtime data: `~/.meal-prep-agent/profile.json` and `~/.meal-prep-agent/history.json`
+- Legacy private runtime data: `plugins/meal-prep-agent/data/local/profile.json` and `plugins/meal-prep-agent/data/local/history.json`
 
-On first run, create missing private runtime files by copying the template JSON content into `data/local/`. The agent should do this with its normal file tools.
+On first run, create missing private runtime files in `~/.meal-prep-agent/` by copying the template JSON content. The agent should do this with its normal file tools.
 
-If the user asks to set up or change their meal prep profile, ask plain-language questions and then update `data/local/profile.json`. Useful setup questions include how many breakfasts, lunches, and dinners they want, how many distinct recipes for each meal type, dietary rules, allergies, dislikes, preferred cuisines, equipment, budget notes, and recurring optional staples.
+If legacy `data/local/` files exist and the matching `~/.meal-prep-agent/` file is missing, migrate the legacy file to `~/.meal-prep-agent/` before planning. Do not overwrite an existing `~/.meal-prep-agent/` file with legacy data unless the user explicitly asks.
+
+If the user asks to set up or change their meal prep profile, ask plain-language questions and then update `~/.meal-prep-agent/profile.json`. Useful setup questions include how many breakfasts, lunches, and dinners they want, how many distinct recipes for each meal type, dietary rules, allergies, dislikes, preferred cuisines, equipment, budget notes, and recurring optional staples.
 
 ## Meal Type Configuration
 
@@ -48,7 +51,7 @@ Always read the private profile and history before planning. Summarize recent me
 
 The parent agent owns orchestration and final review. It must:
 
-1. Create missing private runtime files from templates if needed, then read `data/local/profile.json` and `data/local/history.json`.
+1. Create or migrate missing private runtime files in `~/.meal-prep-agent/` from templates or legacy `data/local/` files if needed, then read `~/.meal-prep-agent/profile.json` and `~/.meal-prep-agent/history.json`.
 2. If the private profile is still a mostly empty template, offer to set it up conversationally before planning.
 3. If the active profile has `optional_constants`, ask the user which constants they need this week before planning the grocery list.
 4. Ask a recipe-planning sub-agent to propose exactly the configured recipe counts for each enabled meal type, covering exactly the configured servings.
@@ -56,9 +59,9 @@ The parent agent owns orchestration and final review. It must:
 6. Ask an ingredient-combiner sub-agent to merge all recipe ingredients plus only the user-selected optional constants into one concise grocery list.
 7. Pass each grocery-list ingredient to a Woolworths lookup sub-agent, one ingredient at a time.
 8. Present the full plan to the user before treating it as complete.
-9. Append the accepted plan to the active private `history.json` only after user acceptance or an explicit request to save it.
+9. Append the accepted plan to the active private `history.json` after user acceptance, an explicit request to save it, or any user request to proceed to the Woolworths cart from that plan.
 
-Do not save a generated plan to memory before the user accepts it.
+Do not save a generated plan to memory before the user accepts it. A request to build, prepare, add to, or proceed to a Woolworths cart using the generated grocery list counts as acceptance of the meal plan for memory purposes.
 
 ## Optional Constants Prompt
 
@@ -250,7 +253,7 @@ Before completing, present the plan back to the user in this order:
 
 Keep the response concise. The user should be able to scan the plan, cook from it, and shop from it.
 
-End by asking whether to save the plan to memory. Save it only if the user approves.
+End by asking whether to save the plan to memory. Save it only if the user approves, unless the user asks to proceed to the Woolworths cart, which counts as approval to save the plan before cart building starts.
 
 ## Memory Update
 
@@ -267,3 +270,5 @@ When saving a plan, append a new entry to the active private history with:
 - `repeat_avoidance_note`
 
 The accepted plan JSON should include the fields above. Preserve the top-level `version` and append to `generated_plans`. Do not write private meal history back to template files. If the JSON file is invalid or cannot be updated cleanly, stop and explain the issue instead of guessing.
+
+If the user proceeds to the Woolworths cart from a generated meal plan, write the meal history before opening the browser or starting the cart-builder workflow. Mention briefly that the plan was saved because the user proceeded to cart building.

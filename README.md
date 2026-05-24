@@ -147,17 +147,30 @@ For example, 5 lunches with `recipe_count: 2` means the agent should plan 5
 lunch portions spread across 2 different lunch recipes.
 
 The agent will ask plain-language questions, then create private runtime files
-from the templates:
+from the templates in a user-home directory:
+
+```text
+~/.meal-prep-agent/profile.json
+~/.meal-prep-agent/history.json
+```
+
+This directory is outside the plugin install/cache directory, so reinstalling or
+updating the Codex or Claude Code plugin should not remove meal history.
+
+Older versions stored private files under:
 
 ```text
 plugins/meal-prep-agent/data/local/
 ```
 
-That directory is ignored by git. The agent reads the private profile and meal
-history directly, summarizes recent meals to avoid repeats, and appends accepted
-plans after explicit approval.
+If those legacy files exist and `~/.meal-prep-agent/` is missing, the agent
+should migrate them into the user-home directory before planning. The agent
+reads the private profile and meal history directly, summarizes recent meals to
+avoid repeats, and appends accepted plans after explicit approval.
 
-The skill should only append plans after explicit user approval.
+The skill should only append plans after explicit user approval. Proceeding to
+the Woolworths cart from a generated meal plan counts as approval to save that
+meal plan first.
 
 ## Woolworths Cart Builder
 
