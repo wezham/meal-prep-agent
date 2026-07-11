@@ -45,7 +45,23 @@ Rules:
 - Keep `recipe_count` between `0` and `servings` for each meal type. If the user asks for more recipes than servings, set recipes equal to servings and mention the adjustment.
 - Default to the template values if the user has not configured meal counts: 3 lunches from 1 lunch recipe and 3 dinners from 1 dinner recipe.
 
-Always read the private profile and history before planning. Summarize recent meal names, primary proteins, core ingredients, cuisine tags, and sauce profiles from `history.json` directly before choosing recipes.
+Always read the private profile and history before planning. Summarize recent meal names, primary proteins, core ingredients, cuisine tags, sauce profiles, and flavour seeds from `history.json` directly before choosing recipes.
+
+## Weekly Flavour Seed
+
+Before proposing recipes, choose one region or cuisine as the weekly `flavour_seed`. Use it as a creative constraint for the whole plan so the recipes, seasonings, sauces, and suitable sides feel recognizably connected to that food tradition instead of falling back to generic defaults.
+
+Choose the seed in this order:
+
+1. Use a region or cuisine explicitly requested by the user for this plan.
+2. Otherwise, choose from `profile.preferred_cuisines` when that list is non-empty.
+3. Otherwise, choose from a broad pool such as Korean, Vietnamese, Japanese, South Indian, Sri Lankan, Levantine, Turkish, Greek, Moroccan, Ethiopian, Mexican, Caribbean, Peruvian, Spanish, Italian, or West African.
+
+Exclude cuisines in `profile.avoid_cuisines`. Unless the user explicitly requests one, also exclude flavour seeds used by the last four accepted plans. Prefer a seed with a different dominant flavour profile from recent sauces and seasonings. If exclusions empty the candidate pool, reuse the least-recently-used allowed seed and explain that fallback in `seed_selection_note`.
+
+The seed is not permission to invent authenticity claims or require hard-to-find ingredients. Adapt recipes for the profile's dietary rules, equipment, budget, and Woolworths availability while retaining several recognizable elements of the chosen cuisine. Different recipes in the same plan should express the seed differently rather than repeating one sauce or ingredient combination.
+
+Do not silently replace the seed after it is chosen. If it conflicts with an allergy, dietary rule, or explicit dislike, select another allowed seed before recipe generation. Include the chosen seed and a short selection reason in the recipe-planning brief and final plan.
 
 ## Parent Agent Responsibilities
 
@@ -53,13 +69,14 @@ The parent agent owns orchestration and final review. It must:
 
 1. Create or migrate missing private runtime files in `~/.meal-prep-agent/` from templates or legacy `data/local/` files if needed, then read `~/.meal-prep-agent/profile.json` and `~/.meal-prep-agent/history.json`.
 2. If the private profile is still a mostly empty template, offer to set it up conversationally before planning.
-3. If the active profile has `optional_constants`, ask the user which constants they need this week before planning the grocery list.
-4. Ask a recipe-planning sub-agent to propose exactly the configured recipe counts for each enabled meal type, covering exactly the configured servings.
-5. Ask an instruction sub-agent to convert the recipes into one practical batch-cooking sequence.
-6. Ask an ingredient-combiner sub-agent to merge all recipe ingredients plus only the user-selected optional constants into one concise grocery list.
-7. Pass each grocery-list ingredient to a Woolworths lookup sub-agent, one ingredient at a time.
-8. Present the full plan to the user before treating it as complete.
-9. Append the accepted plan to the active private `history.json` after user acceptance, an explicit request to save it, or any user request to proceed to the Woolworths cart from that plan.
+3. Select the weekly flavour seed using the profile and accepted-plan history.
+4. If the active profile has `optional_constants`, ask the user which constants they need this week before planning the grocery list.
+5. Ask a recipe-planning sub-agent to propose exactly the configured recipe counts for each enabled meal type, covering exactly the configured servings and following the selected flavour seed.
+6. Ask an instruction sub-agent to convert the recipes into one practical batch-cooking sequence.
+7. Ask an ingredient-combiner sub-agent to merge all recipe ingredients plus only the user-selected optional constants into one concise grocery list.
+8. Pass each grocery-list ingredient to a Woolworths lookup sub-agent, one ingredient at a time.
+9. Present the full plan to the user before treating it as complete.
+10. Append the accepted plan, including its flavour seed, to the active private `history.json` after user acceptance, an explicit request to save it, or any user request to proceed to the Woolworths cart from that plan.
 
 Do not save a generated plan to memory before the user accepts it. A request to build, prepare, add to, or proceed to a Woolworths cart using the generated grocery list counts as acceptance of the meal plan for memory purposes.
 
@@ -86,6 +103,8 @@ Rules:
 ## Recipe-Planning Sub-Agent Brief
 
 Ask the recipe-planning sub-agent to produce the configured number of batch recipes for each enabled meal type. The plan must cover the exact configured serving counts from `profile.meal_plan`.
+
+Pass the selected `flavour_seed`, `seed_selection_note`, recent flavour seeds, and relevant profile preferences to the sub-agent. Every recipe must clearly express the seed through multiple suitable ingredients, seasonings, techniques, or accompaniments. A cuisine label alone is not sufficient. Require the sub-agent to explain the connection in `seed_alignment_note` and reject or revise a result when a recipe does not meaningfully follow the seed.
 
 For the default template, this means:
 
@@ -115,6 +134,8 @@ Require this shape from the sub-agent:
 
 ```json
 {
+  "flavour_seed": "",
+  "seed_selection_note": "",
   "meal_plan": {
     "breakfast": {"servings": 0, "recipe_count": 0, "enabled": false},
     "lunch": {"servings": 3, "recipe_count": 1, "enabled": true},
@@ -128,6 +149,7 @@ Require this shape from the sub-agent:
       "short_description": "",
       "core_ingredients": [],
       "cuisine_tags": [],
+      "seed_alignment_note": "",
       "preservation_notes": "",
       "crossover_notes": ""
     },
@@ -138,6 +160,7 @@ Require this shape from the sub-agent:
       "short_description": "",
       "core_ingredients": [],
       "cuisine_tags": [],
+      "seed_alignment_note": "",
       "preservation_notes": "",
       "crossover_notes": ""
     }
@@ -246,10 +269,11 @@ Keep notes short. Mention substitutions only when confidence is not `high`.
 Before completing, present the plan back to the user in this order:
 
 1. `Meals`
-2. `Combined Ingredients`
-3. `Cook Plan`
-4. `Woolworths Links`
-5. `Memory Note`
+2. `Flavour Seed`
+3. `Combined Ingredients`
+4. `Cook Plan`
+5. `Woolworths Links`
+6. `Memory Note`
 
 Keep the response concise. The user should be able to scan the plan, cook from it, and shop from it.
 
@@ -260,6 +284,8 @@ End by asking whether to save the plan to memory. Save it only if the user appro
 When saving a plan, append a new entry to the active private history with:
 
 - `generated_at`
+- `flavour_seed`
+- `seed_selection_note`
 - `meal_plan`
 - `recipes`
 - `breakfasts`

@@ -8,6 +8,7 @@ Node, Bash scripts, or any other helper runtime.
 The plugin can:
 
 - generate configurable breakfasts, lunches, and dinners from configured batch recipe counts
+- rotate through a weekly region or cuisine seed for more varied flavour profiles
 - combine ingredients into one grocery list
 - produce concise batch-cooking instructions
 - avoid recent repeats with private local meal history
@@ -167,6 +168,12 @@ If those legacy files exist and `~/.meal-prep-agent/` is missing, the agent
 should migrate them into the user-home directory before planning. The agent
 reads the private profile and meal history directly, summarizes recent meals to
 avoid repeats, and appends accepted plans after explicit approval.
+
+Before generating recipes, it selects a weekly flavour seed. An explicitly
+requested cuisine wins; otherwise it uses allowed preferred cuisines or a broad
+global pool, excluding avoided cuisines and the last four accepted seeds when
+possible. The chosen seed guides every recipe in the plan and is saved with
+accepted plans so later weeks rotate away from it.
 
 The skill should only append plans after explicit user approval. Proceeding to
 the Woolworths cart from a generated meal plan counts as approval to save that
