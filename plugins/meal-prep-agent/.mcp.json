@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "woolworths": {
+      "command": "uv",
+      "args": [
+        "run",
+        "--project",
+        "./mcp",
+        "--frozen",
+        "python",
+        "./mcp/bootstrap.py"
+      ],
+      "cwd": "."
+    }
+  }
+}

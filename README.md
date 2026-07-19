@@ -13,7 +13,7 @@ The plugin can:
 - produce concise batch-cooking instructions
 - avoid recent repeats with private local meal history
 - find Woolworths Australia product links with confidence notes
-- prepare a Woolworths cart review workflow without checking out
+- build and verify a Woolworths cart through the Woolworths MCP without checking out
 
 ## Repository Layout
 
@@ -23,12 +23,18 @@ The plugin can:
 plugins/meal-prep-agent/
   .claude-plugin/plugin.json
   .codex-plugin/plugin.json
+  .mcp.json
   data/
     profile.template.json
     history.template.json
   skills/
     weekly-meal-prep/SKILL.md
     woolworths-cart-builder/SKILL.md
+  mcp/
+    bootstrap.py
+    pyproject.toml
+    uv.lock
+    src/woolworths_mcp/
 ```
 
 ## Install
@@ -181,14 +187,30 @@ meal plan first.
 
 ## Woolworths Cart Builder
 
+The plugin bundles the unofficial
+[`woolworths-mcp`](https://github.com/wezham/woolworths-mcp) source and declares
+it under the MCP server name `woolworths`. It uses that server for a visible
+login session, product search, cart mutations, and final cart verification.
+
+The host needs `uv` and network access on first use. The bundled launcher uses
+the committed lockfile to provision Python 3.12 dependencies and installs the
+Playwright Chromium browser before starting the server. Subsequent starts reuse
+the cached environment and browser. Installation output is sent to stderr so it
+cannot corrupt MCP's stdio protocol.
+
+The bundled MCP component retains its `GPL-3.0-only` license in
+`plugins/meal-prep-agent/mcp/LICENSE`; the meal-prep plugin's own files remain
+under this repository's MIT license.
+
 Ask:
 
 ```text
 Use the woolworths-cart-builder skill to add this grocery list to my Woolworths cart.
 ```
 
-The cart-builder workflow stops at cart review. It must not place an order,
-choose payment details, or submit checkout.
+The cart-builder workflow leaves the Woolworths browser open at cart review so
+the user can make the final purchase. It must not place an order, choose
+payment details, set fulfilment, or submit checkout.
 
 ## Release Checklist
 

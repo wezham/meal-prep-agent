@@ -1,0 +1,51 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "woolworths-mcp"
+version = "1.0.0"
+description = "A typed FastMCP server for Woolworths Australia"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+license = { text = "GPL-3.0-only" }
+dependencies = [
+  "fastmcp>=2.12,<4",
+  "httpx>=0.28,<1",
+  "platformdirs>=4.3,<5",
+  "playwright>=1.50,<2",
+  "pydantic>=2.10,<3",
+]
+
+[project.optional-dependencies]
+dev = [
+  "mypy>=1.14,<2",
+  "pytest>=8.3,<9",
+  "pytest-asyncio>=0.25,<2",
+  "pytest-cov>=6,<8",
+  "respx>=0.22,<1",
+  "ruff>=0.9,<1",
+]
+
+[project.scripts]
+woolworths-mcp = "woolworths_mcp.server:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/woolworths_mcp"]
+
+[tool.pytest.ini_options]
+addopts = "--strict-markers --strict-config"
+asyncio_mode = "auto"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "RUF"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+packages = ["woolworths_mcp"]
