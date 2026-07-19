@@ -5,14 +5,14 @@
   },
   "metadata": {
     "description": "Cross-agent meal prep workflows for Claude Code and Codex.",
-    "version": "0.1.0"
+    "version": "0.2.0"
   },
   "plugins": [
     {
       "name": "meal-prep-agent",
       "source": "./plugins/meal-prep-agent",
-      "description": "Generate configurable weekly meal prep plans for breakfasts, lunches, and dinners, plus combined grocery lists, Woolworths product links, and cart-review workflows.",
-      "version": "0.1.0",
+      "description": "Generate configurable weekly meal prep plans and build verified Woolworths carts with the bundled MCP server.",
+      "version": "0.2.0",
       "author": {
         "name": "Wesley Hamburger"
       }
